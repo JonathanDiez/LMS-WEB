@@ -18,7 +18,8 @@
     --shadow: 0 .5rem 1rem rgba(0,0,0,.15);
     --border-radius: .375rem;
     --font-family-sans-serif: 'Poppins', sans-serif;
-    --primary-color-rgb: 0,123,255;
+    --primary-color-rgb: 0,123,255; /* Para el azul #007bff */
+    --text-color-rgb: 33,37,41; /* Para el texto #212529 */
 }
 
 .dark-mode {
@@ -29,16 +30,17 @@
     /* --warning-color: #ffca2c; */ /* Ya está bien */
     --info-color: #0dcaf0;
 
-    --bg-color: #121212; /* Fondo principal aún más oscuro */
-    --surface-color: #1e1e1e; /* Superficies ligeramente más claras */
+    --bg-color: #121212; 
+    --surface-color: #1e1e1e; 
     --text-color: #e0e0e0;
     --text-muted-color: #a0a0a0;
-    --border-color: #3a3a3a; /* Bordes más sutiles */
+    --border-color: #3a3a3a; 
     --input-bg: #2c2c2c;
     --input-border: #4a4a4a;
     --shadow-sm: 0 .125rem .25rem rgba(255,255,255,.03);
     --shadow: 0 .5rem 1rem rgba(255,255,255,.06);
-    --primary-color-rgb: 13,110,253;
+    --primary-color-rgb: 13,110,253; /* Para el azul #0d6efd */
+    --text-color-rgb: 224,224,224; /* Para el texto #e0e0e0 */
 }
 
 
@@ -50,15 +52,15 @@ body {
     line-height: 1.6;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Cambiado para el loader */
+    align-items: flex-start; 
     min-height: 100vh;
-    padding-top: 0; /* El app-container manejará el padding */
+    padding-top: 0; 
     transition: background-color 0.3s ease, color 0.3s ease;
-    overflow-x: hidden; /* Evitar scroll horizontal accidental */
+    overflow-x: hidden; 
 }
 
 /* --- LOADER --- */
-.app-loader-active {
+#app-loader {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -68,12 +70,20 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: var(--bg-color); /* Usa el color de fondo del tema */
+    background-color: var(--bg-color);
     z-index: 9999;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+    transition: opacity 0.3s ease 0.1s, visibility 0.3s ease 0.1s;
+    opacity: 1;
+    visibility: visible;
 }
+#app-loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
 .spinner {
-    border: 4px solid rgba(var(--text-color-rgb, 33, 37, 41), 0.1); /* Usa text-color para el borde claro */
+    border: 4px solid rgba(var(--text-color-rgb), 0.1); 
     border-left-color: var(--primary-color);
     border-radius: 50%;
     width: 40px;
@@ -81,45 +91,38 @@ body {
     animation: spin 1s linear infinite;
     margin-bottom: 15px;
 }
-.dark-mode .spinner {
-    border: 4px solid rgba(224, 224, 224, 0.1); /* Borde claro para dark mode */
-    border-left-color: var(--primary-color);
-}
+/* No es necesario .dark-mode .spinner si --text-color-rgb se define correctamente para ambos modos */
 
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
-.app-loader-active p {
+#app-loader p {
     font-size: 1rem;
     color: var(--text-muted-color);
 }
-body.auth-loaded .app-loader-active {
-    opacity: 0;
-    visibility: hidden;
-}
-
 
 #app-container {
     width: 100%;
     max-width: 1200px;
-    padding: 20px 15px 0 15px; /* Padding superior aquí */
+    padding: 20px 15px 0 15px;
+    display: none; /* Oculto por defecto, JS lo mostrará */
 }
 
 .screen { display: none; }
 .screen.active { display: block; }
 
 /* --- LOGIN SCREEN --- */
-#login-screen.active { /* Asegurar que ocupe toda la pantalla cuando está activa */
+#login-screen.active { 
     display: flex; 
     align-items: center;
     justify-content: center;
-    position: fixed; /* Para que esté por encima de todo */
+    position: fixed; 
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    padding: 0; /* Quitar padding del app-container */
-    z-index: 1000; /* Asegurar que está encima del app-container normal */
+    padding: 0; 
+    z-index: 1000; 
 }
 
 .login-wallpaper {
@@ -131,7 +134,7 @@ body.auth-loaded .app-loader-active {
     background-image: url('https://i.imgur.com/2nW8rVX.jpeg');
     background-size: cover;
     background-position: center;
-    filter: brightness(0.5); /* Ajusta el brillo si es necesario */
+    filter: brightness(0.5); 
     z-index: 1;
 }
 
@@ -141,7 +144,7 @@ body.auth-loaded .app-loader-active {
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
     max-width: 400px;
-    width: calc(100% - 40px); /* Para que no sea demasiado ancho en móviles */
+    width: calc(100% - 40px); 
     text-align: center;
     z-index: 2;
     position: relative;
@@ -150,8 +153,6 @@ body.auth-loaded .app-loader-active {
 .dark-mode .login-container {
     background-color: rgba(30, 30, 30, 0.9); 
 }
-
-/* Eliminado .login-logo */
 
 .login-container h2 {
     color: var(--primary-color);
@@ -249,7 +250,6 @@ body.auth-loaded .app-loader-active {
 .form-hint { font-size: 0.8em; color: var(--text-muted-color); display: block; margin-top: 4px; }
 
 /* --- MAIN APP SCREEN --- */
-
 header {
     background-color: var(--surface-color);
     color: var(--text-color);
@@ -262,9 +262,8 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1200px; /* Coincide con app-container */
+    max-width: 1200px;
     margin: 0 auto;
-    /* padding: 0 15px; No es necesario, app-container ya lo tiene */
 }
 header h1 { margin: 0; font-size: 1.8rem; font-weight: 600; color: var(--primary-color); }
 .header-controls { display: flex; align-items: center; gap: 15px; }
@@ -282,7 +281,7 @@ main {
     gap: 5px;
     margin-bottom: 25px;
     border-bottom: 2px solid var(--border-color);
-    padding-bottom: 0; /* Ajuste para que el borde de la pestaña activa se alinee bien */
+    padding-bottom: 0; 
     overflow-x: auto; 
 }
 .tab-button {
@@ -294,7 +293,7 @@ main {
     background-color: transparent;
     color: var(--text-muted-color);
     border-bottom: 3px solid transparent;
-    margin-bottom: -2px; /* Para que el borde se solape con el borde general */
+    margin-bottom: -2px; 
     transition: color 0.2s ease, border-bottom-color 0.2s ease;
     white-space: nowrap;
 }
@@ -305,7 +304,6 @@ main {
 }
 
 #product-list-container {
-    /* display: grid;  Lo maneja JS */
     gap: 25px;
 }
 
@@ -363,7 +361,7 @@ main {
     margin-bottom: 15px;
 }
 .stock-controls .btn-icon-small {
-    padding: 8px 10px; /* Ligeramente más grande para mejor click */
+    padding: 8px 10px; 
     font-size: 1rem;
     background-color: var(--input-bg);
     color: var(--text-color);
@@ -373,19 +371,19 @@ main {
 .dark-mode .stock-controls .btn-icon-small:hover { background-color: #4a4a4a; }
 
 
-.stock-controls input[type="number"].bulk-stock-amount { /* Clase específica */
-    width: 70px; /* Ajustado */
+.stock-controls input[type="number"].bulk-stock-amount { 
+    width: 70px; 
     padding: 8px;
     text-align: center;
     border: 1px solid var(--input-border);
     border-radius: var(--border-radius);
     background-color: var(--input-bg);
     color: var(--text-color);
-    -moz-appearance: textfield; /* Para Firefox */
+    -moz-appearance: textfield; 
 }
 .stock-controls input[type="number"].bulk-stock-amount::-webkit-outer-spin-button,
 .stock-controls input[type="number"].bulk-stock-amount::-webkit-inner-spin-button {
-    -webkit-appearance: none; /* Para Chrome, Safari, Edge, Opera */
+    -webkit-appearance: none; 
     margin: 0;
 }
 
@@ -409,7 +407,7 @@ main {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.7); /* Más oscuro el overlay */
+    background-color: rgba(0, 0, 0, 0.7); 
     align-items: center;
     justify-content: center;
     padding: 20px;
@@ -443,7 +441,7 @@ main {
 }
 .close-button:hover, .close-button:focus { color: var(--danger-color); }
 .modal-content h2 { margin-top: 0; color: var(--primary-color); margin-bottom: 25px; font-weight: 600; }
-.modal-content.editing-mode #product-initial-stock-group { /* Usamos el ID del group */
+.modal-content.editing-mode #product-initial-stock-group { 
     display: none;
 }
 
@@ -455,21 +453,21 @@ footer { text-align: center; padding: 30px 0; margin-top: 40px; color: var(--tex
     .header-controls { width: 100%; justify-content: space-between; }
     .user-info { justify-content: flex-end; }
     .product-grid { grid-template-columns: 1fr; }
-    .login-container { margin: 0 20px; } /* Centrado por flex en #login-screen */
+    .login-container { margin: 0 20px; } 
     .main-controls { text-align: center; }
     .category-tabs { padding-left: 0; padding-right: 0; } 
 }
 @media (max-width: 480px) {
     .login-container h2 { font-size: 1.5rem; }
     .stock-controls { 
-        flex-wrap: nowrap; /* Evitar que se envuelvan, mejor que se achiquen */
+        flex-wrap: nowrap; 
         justify-content: space-between;
     }
     .stock-controls input[type="number"].bulk-stock-amount {
-        width: 50px; /* Más pequeño */
+        width: 50px; 
     }
     .stock-controls .btn-icon-small {
-        padding: 8px; /* Más pequeño */
+        padding: 8px; 
         font-size: 0.9rem;
     }
     .product-actions { flex-direction: column; }
