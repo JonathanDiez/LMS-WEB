@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Firebase Config --- (Sin cambios)
     const firebaseConfig = {
       apiKey: "AIzaSyAGLOrAVlbGHxxA2CWJsMOVyxPPsICQBVA", // TU API KEY
       authDomain: "lamesashopweb.firebaseapp.com",
@@ -10,11 +11,20 @@ document.addEventListener('DOMContentLoaded', () => {
       measurementId: "G-KM4WBQPN0X"
     };
 
-    firebase.initializeApp(firebaseConfig);
+    // --- Initialize Firebase ---
+    try {
+        firebase.initializeApp(firebaseConfig);
+    } catch (e) {
+        console.error("Error inicializando Firebase:", e);
+        // Podrías mostrar un mensaje de error más amigable al usuario aquí
+        document.getElementById('app-loader').innerHTML = '<p style="color:red;">Error al conectar con el servidor. Por favor, recarga la página.</p>';
+        return; // Detener la ejecución si Firebase no se inicializa
+    }
+    
     const auth = firebase.auth();
     const db = firebase.database();
 
-    // DOM Elements
+    // --- DOM Elements --- (Sin cambios en las declaraciones)
     const body = document.body;
     const appLoader = document.getElementById('app-loader');
     const appContainer = document.getElementById('app-container');
@@ -26,10 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutButton = document.getElementById('logout-button');
     const themeToggleButton = document.getElementById('theme-toggle-button');
     const copyrightYearSpan = document.getElementById('copyright-year');
-
     const productListContainer = document.getElementById('product-list-container');
     const categoryTabsContainer = document.querySelector('.category-tabs');
-    
     const showAddProductModalButton = document.getElementById('show-add-product-modal-button');
     const productModal = document.getElementById('product-modal');
     const productModalContent = productModal.querySelector('.modal-content');
@@ -45,9 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const productInitialStockGroup = document.getElementById('product-initial-stock-group');
     const productImageNameInput = document.getElementById('product-image-name');
 
+    // --- Constants --- (Sin cambios)
     const DEFAULT_IMAGE_URL = 'default-product.png';
     const PRODUCT_IMAGE_FOLDER = 'productos/';
-
     const CATEGORIES_CONFIG = {
         "ARMAS": { name: "Armas", subcategories: ["PISTOLAS", "SUBFUSILES", "FUSILES", "ESCOPETAS"] },
         "DROGAS": { name: "Drogas", subcategories: [] },
@@ -57,11 +65,22 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const CATEGORY_ORDER = Object.keys(CATEGORIES_CONFIG);
 
+    // --- App State --- (Sin cambios)
     let productsData = {};
     let activeCategory = CATEGORY_ORDER[0];
 
-    // --- INITIAL SETUP ---
-    function initializeApp() {
+    // --- SLUGIFY --- (Sin cambios)
+    function slugify(text) {
+        if (!text) return '';
+        return text.toString().toLowerCase()
+            .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/\s+/g, '_').replace(/[^\w-]+/g, '')
+            .replace(/--+/g, '_').replace(/^-+/, '').replace(/-+$/, '');
+    }
+
+    // --- INITIAL APP SETUP ---
+    function initializeAppUI() {
+        console.log("initializeAppUI called");
         // Set copyright year
         if (copyrightYearSpan) {
             copyrightYearSpan.textContent = new Date().getFullYear();
@@ -78,24 +97,25 @@ document.addEventListener('DOMContentLoaded', () => {
             applyTheme(newTheme);
         });
 
-        // Auth state change listener
-        auth.onAuthStateChanged(handleAuthStateChange);
-
-        // Modal listeners
-        showAddProductModalButton.addEventListener('click', () => openModal('add'));
-        closeProductModalButton.addEventListener('click', () => productModal.classList.remove('active'));
-        window.addEventListener('click', (event) => {
+        // Modal listeners (solo si los elementos existen para evitar errores si no hay user)
+        if (showAddProductModalButton) showAddProductModalButton.addEventListener('click', () => openModal('add'));
+        if (closeProductModalButton) closeProductModalButton.addEventListener('click', () => productModal.classList.remove('active'));
+        
+        window.addEventListener('click', (event) => { // Este es seguro
             if (event.target === productModal) productModal.classList.remove('active');
         });
-        productCategorySelect.addEventListener('change', handleCategoryChangeForModal);
-        productForm.addEventListener('submit', handleProductFormSubmit);
+
+        if (productCategorySelect) productCategorySelect.addEventListener('change', handleCategoryChangeForModal);
+        if (productForm) productForm.addEventListener('submit', handleProductFormSubmit);
         
-        // Login form listener
-        loginForm.addEventListener('submit', handleLogin);
-        logoutButton.addEventListener('click', () => auth.signOut());
+        // Login form listener (seguro)
+        if (loginForm) loginForm.addEventListener('submit', handleLogin);
+        if (logoutButton) logoutButton.addEventListener('click', () => {
+            auth.signOut().catch(error => console.error("Error al cerrar sesión:", error));
+        });
     }
     
-    // --- THEME ---
+    // --- THEME --- (Sin cambios)
     function applyTheme(theme) {
         if (theme === 'dark') {
             body.classList.add('dark-mode');
@@ -108,36 +128,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- AUTHENTICATION ---
     function handleAuthStateChange(user) {
-        body.classList.add('auth-loaded'); // Indicate auth state is resolved
-        appLoader.classList.remove('app-loader-active'); // Hide loader
-        appContainer.style.display = 'block'; // Show app content area
+        console.log("Auth state changed. User:", user ? user.email : "null");
+        
+        // Hide loader and show app container AFTER auth state is known
+        if (appLoader) appLoader.classList.add('hidden');
+        if (appContainer) appContainer.style.display = 'block';
 
         if (user) {
-            loginScreen.classList.remove('active');
-            mainAppScreen.classList.add('active');
-            userEmailDisplay.textContent = user.email;
+            if (loginScreen) loginScreen.classList.remove('active');
+            if (mainAppScreen) mainAppScreen.classList.add('active');
+            if (userEmailDisplay) userEmailDisplay.textContent = user.email;
             setupCategoryTabs();
             loadProducts();
         } else {
-            mainAppScreen.classList.remove('active');
-            loginScreen.classList.add('active');
-            userEmailDisplay.textContent = '';
-            productListContainer.innerHTML = ''; // Clear products
-            categoryTabsContainer.innerHTML = ''; // Clear tabs
+            if (mainAppScreen) mainAppScreen.classList.remove('active');
+            if (loginScreen) loginScreen.classList.add('active');
+            if (userEmailDisplay) userEmailDisplay.textContent = '';
+            if (productListContainer) productListContainer.innerHTML = '';
+            if (categoryTabsContainer) categoryTabsContainer.innerHTML = '';
         }
     }
 
     function handleLogin(e) {
         e.preventDefault();
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        loginError.textContent = '';
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        if (!emailInput || !passwordInput) return;
+
+        const email = emailInput.value;
+        const password = passwordInput.value;
+        if (loginError) loginError.textContent = '';
+        
         auth.signInWithEmailAndPassword(email, password)
-            .catch(error => loginError.textContent = "Error: " + error.message);
+            .catch(error => {
+                console.error("Login error:", error);
+                if (loginError) loginError.textContent = "Error: " + error.message;
+            });
     }
 
-    // --- CATEGORY TABS ---
+    // --- CATEGORY TABS --- (Sin cambios)
     function setupCategoryTabs() {
+        if (!categoryTabsContainer) return;
         categoryTabsContainer.innerHTML = '';
         CATEGORY_ORDER.forEach(catKey => {
             const tab = document.createElement('button');
@@ -156,12 +187,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- MODAL HANDLING (ADD/EDIT) ---
+    // --- MODAL HANDLING (ADD/EDIT) --- (Sin cambios en la lógica interna, pero wrappers si los elementos no existen)
     function openModal(mode = 'add', productData = null) {
+        if (!productForm || !productIdInput || !modalTitle || !productModalContent || !productInitialStockGroup || !productModal) return;
+        
         productForm.reset();
         productIdInput.value = '';
-        subcategoryGroup.style.display = 'none';
-        productSubcategorySelect.required = false;
+        if (subcategoryGroup) subcategoryGroup.style.display = 'none';
+        if (productSubcategorySelect) productSubcategorySelect.required = false;
 
         if (mode === 'edit' && productData) {
             modalTitle.textContent = 'Editar Producto';
@@ -169,24 +202,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if (productInitialStockGroup) productInitialStockGroup.style.display = 'none';
 
             productIdInput.value = productData.id;
-            productNameInput.value = productData.name;
-            productCategorySelect.value = productData.category;
-            if (productData.category === 'ARMAS') {
+            if (productNameInput) productNameInput.value = productData.name;
+            if (productCategorySelect) productCategorySelect.value = productData.category;
+            if (productData.category === 'ARMAS' && subcategoryGroup && productSubcategorySelect) {
                 subcategoryGroup.style.display = 'block';
                 productSubcategorySelect.required = true;
                 productSubcategorySelect.value = productData.subcategory || '';
             }
-            productImageNameInput.value = productData.imageName || '';
+            if (productImageNameInput) productImageNameInput.value = productData.imageName || '';
         } else {
             modalTitle.textContent = 'Añadir Nuevo Producto';
             productModalContent.classList.remove('editing-mode');
             if (productInitialStockGroup) productInitialStockGroup.style.display = 'block';
-            productInitialStockInput.value = '0'; // Default stock for new
+            if (productInitialStockInput) productInitialStockInput.value = '0';
         }
         productModal.classList.add('active');
     }
 
     function handleCategoryChangeForModal() {
+        if (!productCategorySelect || !subcategoryGroup || !productSubcategorySelect) return;
         if (productCategorySelect.value === 'ARMAS') {
             subcategoryGroup.style.display = 'block';
             productSubcategorySelect.required = true;
@@ -199,10 +233,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleProductFormSubmit(e) {
         e.preventDefault();
+        if (!productIdInput || !productNameInput || !productCategorySelect || !productImageNameInput || !productModal) return;
+
         const id = productIdInput.value;
         const name = productNameInput.value.trim();
         const category = productCategorySelect.value;
-        const subcategory = (category === 'ARMAS') ? productSubcategorySelect.value : '';
+        const subcategory = (category === 'ARMAS' && productSubcategorySelect) ? productSubcategorySelect.value : '';
         const imageName = productImageNameInput.value.trim();
 
         if (!name || !category || (category === 'ARMAS' && !subcategory)) {
@@ -223,7 +259,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(() => productModal.classList.remove('active'))
                 .catch(error => console.error("Error actualizando: ", error));
         } else { // Add
-            productPayload.stock = parseInt(productInitialStockInput.value) || 0;
+            if (productInitialStockInput) {
+                productPayload.stock = parseInt(productInitialStockInput.value) || 0;
+            } else {
+                productPayload.stock = 0; // Default si el input no existe por alguna razón
+            }
             const newProductRef = db.ref('products').push();
             productPayload.id = newProductRef.key;
 
@@ -233,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // --- PRODUCT LOGIC ---
+    // --- PRODUCT LOGIC --- (renderProducts, createProductCard, updateStock, deleteProduct sin cambios mayores, solo verificar que los contenedores existan antes de manipularlos)
     function loadProducts() {
         const productsRef = db.ref('products');
         productsRef.on('value', (snapshot) => {
@@ -241,11 +281,12 @@ document.addEventListener('DOMContentLoaded', () => {
             renderProducts();
         }, (error) => {
             console.error("Error al cargar productos:", error);
-            productListContainer.innerHTML = "<p class='error-message'>Error al cargar productos.</p>";
+            if (productListContainer) productListContainer.innerHTML = "<p class='error-message'>Error al cargar productos.</p>";
         });
     }
 
     function renderProducts() {
+        if (!productListContainer || !CATEGORIES_CONFIG[activeCategory]) return;
         productListContainer.innerHTML = '';
         const productGrid = document.createElement('div');
         productGrid.className = 'product-grid';
@@ -300,12 +341,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const bulkAmountInput = card.querySelector('.bulk-stock-amount');
         card.querySelectorAll('.stock-adjust').forEach(button => {
             button.addEventListener('click', () => {
-                const action = button.dataset.action; // 'add' o 'remove'
+                const action = button.dataset.action;
                 let amount = parseInt(bulkAmountInput.value);
 
                 if (isNaN(amount) || amount <= 0) {
                     alert("Por favor, introduce una cantidad positiva válida.");
-                    bulkAmountInput.value = "1"; // Reset a 1
+                    bulkAmountInput.value = "1";
                     return;
                 }
                 if (action === 'remove') amount = -amount;
@@ -336,15 +377,10 @@ document.addEventListener('DOMContentLoaded', () => {
         db.ref(`products/${productId}`).remove()
             .catch(error => console.error("Error eliminando producto:", error));
     }
-    
-    function slugify(text) { // Asegúrate que slugify esté disponible
-        if (!text) return '';
-        return text.toString().toLowerCase()
-            .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
-            .replace(/\s+/g, '_').replace(/[^\w-]+/g, '')
-            .replace(/--+/g, '_').replace(/^-+/, '').replace(/-+$/, '');
-    }
 
-    // Start the app
-    initializeApp();
+    // --- Start the app logic ---
+    // 1. Initialize UI elements (theme, copyright) that don't depend on auth.
+    initializeAppUI();
+    // 2. Firebase auth will then trigger handleAuthStateChange.
+    //    No need to call it explicitly here, `onAuthStateChanged` handles the initial check.
 });
