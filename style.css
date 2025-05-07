@@ -338,6 +338,16 @@ main {
     display: inline-block;
 }
 
+.category-tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 25px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
 .product-info p.stock-display { margin-bottom: 15px; font-size: 1rem; color: var(--text-muted-color); }
 .product-info p.stock-display strong { color: var(--primary-color); font-size: 1.3rem; font-weight: 600; }
 
