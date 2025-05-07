@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Stock</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app-container">
+        <!-- Pantalla de Login -->
+        <div id="login-screen" class="screen active">
+            <div class="login-container">
+                <h2>Iniciar Sesión</h2>
+                <form id="login-form">
+                    <div class="input-group">
+                        <label for="email">Correo Electrónico</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Acceder</button>
+                    <p id="login-error" class="error-message"></p>
+                </form>
+            </div>
+        </div>
+
+        <!-- Pantalla Principal de la Aplicación -->
+        <div id="main-app-screen" class="screen">
+            <header>
+                <h1>Gestor de Stock Moderno</h1>
+                <div class="user-info">
+                    <span id="user-email-display"></span>
+                    <button id="logout-button" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Salir</button>
+                </div>
+            </header>
+
+            <main>
+                <div class="controls-area">
+                    <button id="show-add-product-modal-button" class="btn btn-success"><i class="fas fa-plus-circle"></i> Añadir Producto</button>
+                </div>
+
+                <div id="product-list-container">
+                    <!-- Las categorías y productos se cargarán aquí -->
+                </div>
+            </main>
+
+            <footer>
+                <p>© 2023 Tu Nombre o Grupo. Todos los derechos reservados.</p>
+            </footer>
+        </div>
+
+        <!-- Modal para Añadir Producto -->
+        <div id="add-product-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">×</span>
+                <h2>Añadir Nuevo Producto</h2>
+                <form id="add-product-form">
+                    <div class="input-group">
+                        <label for="product-name">Nombre del Producto:</label>
+                        <input type="text" id="product-name" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="product-category">Categoría Principal:</label>
+                        <select id="product-category" required>
+                            <option value="">Selecciona una categoría...</option>
+                            <option value="ARMAS">ARMAS</option>
+                            <option value="DROGAS">DROGAS</option>
+                            <option value="CARGADORES">CARGADORES</option>
+                            <option value="PLANOS">PLANOS</option>
+                            <option value="QUIMICOS">QUÍMICOS</option>
+                        </select>
+                    </div>
+                    <div class="input-group" id="subcategory-group" style="display: none;">
+                        <label for="product-subcategory">Subcategoría (Armas):</label>
+                        <select id="product-subcategory">
+                            <option value="">Selecciona una subcategoría...</option>
+                            <option value="PISTOLAS">PISTOLAS</option>
+                            <option value="SUBFUSILES">SUBFUSILES</option>
+                            <option value="FUSILES">FUSILES</option>
+                            <option value="ESCOPETAS">ESCOPETAS</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="product-stock">Stock Inicial:</label>
+                        <input type="number" id="product-stock" value="0" min="0" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="product-image-url">URL de la Imagen (opcional, por defecto se usará una genérica):</label>
+                        <input type="url" id="product-image-url" placeholder="https://ejemplo.com/imagen.png">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar Producto</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>
