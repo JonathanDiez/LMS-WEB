@@ -184,6 +184,7 @@ body {
     color: var(--text-color);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
+.input-group input[type="number"] { padding-left: 15px; } /* No icon for numbers */
 .input-group select { padding: 12px 15px; }
 .input-group input:focus,
 .input-group select:focus {
@@ -339,6 +340,31 @@ main {
     display: inline-block;
 }
 
+.product-price-info { margin-bottom: 10px; }
+.product-price-info p {
+    margin: 2px 0;
+    font-size: 0.95rem;
+    color: var(--text-muted-color);
+}
+.product-price-info strong {
+    color: var(--success-color);
+    font-weight: 600;
+}
+.dark-mode .product-price-info strong {
+    color: var(--success-color); /* Or a lighter shade of green if needed */
+}
+
+.product-stock-value {
+    margin-top: 5px;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+    color: var(--info-color);
+}
+.product-stock-value strong {
+    font-weight: 600;
+}
+
+
 .product-info p.stock-display { margin-bottom: 15px; font-size: 1rem; color: var(--text-muted-color); }
 .product-info p.stock-display strong { color: var(--primary-color); font-size: 1.3rem; font-weight: 600; }
 
@@ -429,6 +455,7 @@ main {
 .modal-content.editing-mode #product-initial-stock-group {
     display: none;
 }
+#arma-prices-group { display: none; } /* Hidden by default */
 
 footer {
     text-align: center;
@@ -438,6 +465,9 @@ footer {
     font-size: 0.9rem;
     border-top: 1px solid var(--border-color);
 }
+footer p { margin: 5px 0; }
+#total-inventory-value { font-weight: bold; color: var(--primary-color); }
+
 
 @media (max-width: 768px) {
     .header-content { flex-direction: column; gap: 10px; text-align: center; }
