@@ -8,18 +8,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
-<body class="auth-loading"> <!-- Inicia con clase 'auth-loading', se añadirá 'dark-mode' con JS -->
-    <div id="app-loader" class="app-loader-active"> <!-- Loader simple -->
+<body class="auth-loading">
+    <div id="app-loader">
         <div class="spinner"></div>
         <p>Cargando LA MESA SHOP...</p>
     </div>
 
-    <div id="app-container" style="display: none;"> <!-- Ocultar app-container inicialmente -->
-        <!-- Pantalla de Login -->
-        <div id="login-screen" class="screen"> <!-- No 'active' por defecto -->
+    <div id="app-container" style="display: none;">
+        <div id="login-screen" class="screen">
             <div class="login-wallpaper"></div>
             <div class="login-container">
-                <!-- Eliminado el logo de aquí -->
                 <h2>LA MESA SHOP</h2>
                 <p>Iniciar Sesión</p>
                 <form id="login-form">
@@ -37,14 +35,13 @@
             </div>
         </div>
 
-        <!-- Pantalla Principal de la Aplicación -->
-        <div id="main-app-screen" class="screen"> <!-- No 'active' por defecto -->
+        <div id="main-app-screen" class="screen">
             <header>
                 <div class="header-content">
                     <h1>LA MESA SHOP</h1>
                     <div class="header-controls">
                         <button id="theme-toggle-button" class="btn btn-icon" title="Cambiar Tema">
-                            <i class="fas fa-sun"></i> <!-- Icono cambiará con JS -->
+                            <i class="fas fa-sun"></i>
                         </button>
                         <div class="user-info">
                             <span id="user-email-display"></span>
@@ -61,13 +58,9 @@
                     </button>
                 </div>
 
-                <nav class="category-tabs">
-                    <!-- Las pestañas se generarán aquí por JS -->
-                </nav>
+                <nav class="category-tabs"></nav>
 
-                <div id="product-list-container">
-                    <!-- Los productos de la categoría activa se cargarán aquí -->
-                </div>
+                <div id="product-list-container"></div>
             </main>
 
             <footer>
@@ -75,13 +68,12 @@
             </footer>
         </div>
 
-        <!-- Modal para Añadir/Editar Producto -->
         <div id="product-modal" class="modal">
             <div class="modal-content">
                 <span class="close-button">×</span>
                 <h2 id="modal-title">Añadir Nuevo Producto</h2>
                 <form id="product-form">
-                    <input type="hidden" id="product-id"> <!-- Para edición -->
+                    <input type="hidden" id="product-id">
                     <div class="input-group">
                         <label for="product-name">Nombre del Producto:</label>
                         <input type="text" id="product-name" required>
@@ -107,7 +99,7 @@
                             <option value="ESCOPETAS">ESCOPETAS</option>
                         </select>
                     </div>
-                    <div class="input-group" id="product-initial-stock-group"> <!-- Añadido ID al group -->
+                    <div class="input-group" id="product-initial-stock-group">
                         <label for="product-initial-stock">Stock (solo para nuevos productos):</label>
                         <input type="number" id="product-initial-stock" value="0" min="0">
                     </div>
@@ -122,7 +114,6 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
