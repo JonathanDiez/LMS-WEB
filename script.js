@@ -1,17 +1,26 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Configuración de Firebase (REEMPLAZA CON TUS DATOS)
+    // Import the functions you need from the SDKs you need
+    // import { initializeApp } from "firebase/app";  // Estos imports no son necesarios porque usamos el SDK global
+    // import { getAnalytics } from "firebase/analytics";
+
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
     const firebaseConfig = {
-        apiKey: "TU_API_KEY",
-        authDomain: "TU_AUTH_DOMAIN",
-        databaseURL: "TU_DATABASE_URL", // Asegúrate que sea la URL de Realtime Database
-        projectId: "TU_PROJECT_ID",
-        storageBucket: "TU_STORAGE_BUCKET",
-        messagingSenderId: "TU_MESSAGING_SENDER_ID",
-        appId: "TU_APP_ID"
+      apiKey: "AIzaSyAGLOrAVlbGHxxA2CWJsMOVyxPPsICQBVA",
+      authDomain: "lamesashopweb.firebaseapp.com",
+      databaseURL: "https://lamesashopweb-default-rtdb.firebaseio.com",
+      projectId: "lamesashopweb",
+      storageBucket: "lamesashopweb.firebasestorage.app",
+      messagingSenderId: "445763500979",
+      appId: "1:445763500979:web:5c4dfa7c402b3a75f069c6",
+      measurementId: "G-KM4WBQPN0X"
     };
 
-    // Inicializar Firebase
-    firebase.initializeApp(firebaseConfig);
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig); // El objeto firebase está disponible globalmente con los SDKs que importamos en el HTML
+    // const app = initializeApp(firebaseConfig);  // Inicializamos usando el objeto firebase global
+    // const analytics = getAnalytics(app);  // Esto no lo estamos usando
+
     const auth = firebase.auth();
     const db = firebase.database();
 
