@@ -1,12 +1,10 @@
 :root {
-    /* Modo Claro (Default) - Pero ahora el JS aplicará dark por defecto */
     --primary-color: #007bff; 
     --secondary-color: #6c757d;
     --success-color: #28a745;
     --danger-color: #dc3545;
     --warning-color: #ffc107;
     --info-color: #17a2b8;
-    
     --bg-color: #f8f9fa;
     --surface-color: #ffffff;
     --text-color: #212529;
@@ -18,18 +16,15 @@
     --shadow: 0 .5rem 1rem rgba(0,0,0,.15);
     --border-radius: .375rem;
     --font-family-sans-serif: 'Poppins', sans-serif;
-    --primary-color-rgb: 0,123,255; /* Para el azul #007bff */
-    --text-color-rgb: 33,37,41; /* Para el texto #212529 */
+    --primary-color-rgb: 0,123,255;
+    --text-color-rgb: 33,37,41;
 }
 
 .dark-mode {
     --primary-color: #0d6efd;
     --secondary-color: #adb5bd;
     --success-color: #198754;
-    /* --danger-color: #dc3545; */ /* Ya está bien */
-    /* --warning-color: #ffca2c; */ /* Ya está bien */
     --info-color: #0dcaf0;
-
     --bg-color: #121212; 
     --surface-color: #1e1e1e; 
     --text-color: #e0e0e0;
@@ -39,10 +34,9 @@
     --input-border: #4a4a4a;
     --shadow-sm: 0 .125rem .25rem rgba(255,255,255,.03);
     --shadow: 0 .5rem 1rem rgba(255,255,255,.06);
-    --primary-color-rgb: 13,110,253; /* Para el azul #0d6efd */
-    --text-color-rgb: 224,224,224; /* Para el texto #e0e0e0 */
+    --primary-color-rgb: 13,110,253;
+    --text-color-rgb: 224,224,224;
 }
-
 
 body {
     font-family: var(--font-family-sans-serif);
@@ -59,7 +53,6 @@ body {
     overflow-x: hidden; 
 }
 
-/* --- LOADER --- */
 #app-loader {
     display: flex;
     flex-direction: column;
@@ -72,14 +65,9 @@ body {
     height: 100%;
     background-color: var(--bg-color);
     z-index: 9999;
-    transition: opacity 0.3s ease 0.1s, visibility 0.3s ease 0.1s;
-    opacity: 1;
-    visibility: visible;
 }
 #app-loader.hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
+    display: none !important;
 }
 
 .spinner {
@@ -91,7 +79,6 @@ body {
     animation: spin 1s linear infinite;
     margin-bottom: 15px;
 }
-/* No es necesario .dark-mode .spinner si --text-color-rgb se define correctamente para ambos modos */
 
 @keyframes spin {
     to { transform: rotate(360deg); }
@@ -105,13 +92,12 @@ body {
     width: 100%;
     max-width: 1200px;
     padding: 20px 15px 0 15px;
-    display: none; /* Oculto por defecto, JS lo mostrará */
+    display: none;
 }
 
 .screen { display: none; }
 .screen.active { display: block; }
 
-/* --- LOGIN SCREEN --- */
 #login-screen.active { 
     display: flex; 
     align-items: center;
@@ -245,11 +231,9 @@ body {
     background-color: rgba(255,255,255,0.1);
 }
 
-
 .error-message { color: var(--danger-color); margin-top: 15px; font-size: 0.9rem; }
 .form-hint { font-size: 0.8em; color: var(--text-muted-color); display: block; margin-top: 4px; }
 
-/* --- MAIN APP SCREEN --- */
 header {
     background-color: var(--surface-color);
     color: var(--text-color);
@@ -370,7 +354,6 @@ main {
 .stock-controls .btn-icon-small:hover { background-color: var(--border-color); }
 .dark-mode .stock-controls .btn-icon-small:hover { background-color: #4a4a4a; }
 
-
 .stock-controls input[type="number"].bulk-stock-amount { 
     width: 70px; 
     padding: 8px;
@@ -387,7 +370,6 @@ main {
     margin: 0;
 }
 
-
 .product-actions {
     padding: 15px;
     border-top: 1px solid var(--border-color);
@@ -396,7 +378,6 @@ main {
     gap: 10px;
 }
 .product-actions .btn { flex-grow: 1; font-size: 0.9rem; }
-
 
 .modal {
     display: none;
@@ -444,7 +425,6 @@ main {
 .modal-content.editing-mode #product-initial-stock-group { 
     display: none;
 }
-
 
 footer { text-align: center; padding: 30px 0; margin-top: 40px; color: var(--text-muted-color); font-size: 0.9rem; border-top: 1px solid var(--border-color); }
 
