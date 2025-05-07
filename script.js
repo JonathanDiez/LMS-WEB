@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function formatPrice(number) {
-        if (isNaN(number) || number === null) {
+        if (isNaN(number) || number === null || typeof number === 'undefined') {
             return '$0';
         }
         const roundedNumber = Math.round(Number(number));
@@ -192,6 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         productForm.reset();
         productIdInput.value = '';
+        // Set default values for price inputs to '0' as per HTML
         productPriceInput.value = '0';
         productPriceLoadedInput.value = '0';
         productPriceUnloadedInput.value = '0';
@@ -207,16 +208,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (productNameInput) productNameInput.value = productData.name;
             if (productCategorySelect) productCategorySelect.value = productData.category;
             
-            handleCategoryChangeForModal(); 
+            handleCategoryChangeForModal(); // Call again to ensure correct fields are shown based on loaded category
 
             if (productData.category === 'ARMAS' && subcategoryGroup && productSubcategorySelect) {
                 productSubcategorySelect.value = productData.subcategory || '';
             }
             if (productImageNameInput) productImageNameInput.value = productData.imageName || '';
             
-            productPriceInput.value = Math.round(parseFloat(productData.price || '0'));
-            productPriceLoadedInput.value = Math.round(parseFloat(productData.priceLoaded || '0'));
-            productPriceUnloadedInput.value = Math.round(parseFloat(productData.priceUnloaded || '0'));
+            // Ensure values are strings for the input fields, and round them
+            productPriceInput.value = String(Math.round(parseFloat(productData.price || '0')));
+            productPriceLoadedInput.value = String(Math.round(parseFloat(productData.priceLoaded || '0')));
+            productPriceUnloadedInput.value = String(Math.round(parseFloat(productData.priceUnloaded || '0')));
 
         } else {
             modalTitle.textContent = 'Añadir Nuevo Producto';
@@ -259,26 +261,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const subcategory = (category === 'ARMAS' && productSubcategorySelect) ? productSubcategorySelect.value : '';
         const imageName = productImageNameInput.value.trim();
         
-        let price = Math.round(parseFloat(productPriceInput.value)) || 0;
+        let price = Math.round(parseFloat(productPriceInput.value)); // No need for || 0 here if min="0" and default is "0"
         let priceLoaded = 0;
         let priceUnloaded = 0;
 
         if (category === 'ARMAS') {
-            priceLoaded = Math.round(parseFloat(productPriceLoadedInput.value)) || 0;
-            priceUnloaded = Math.round(parseFloat(productPriceUnloadedInput.value)) || 0;
+            priceLoaded = Math.round(parseFloat(productPriceLoadedInput.value));
+            priceUnloaded = Math.round(parseFloat(productPriceUnloadedInput.value));
             price = 0; 
              if (!subcategory) {
                 alert("Para Armas, la subcategoría es obligatoria.");
                 return;
             }
+            // Check if prices are valid numbers for ARMAS
+            if (isNaN(priceLoaded) || isNaN(priceUnloaded)) {
+                 alert("Por favor, introduce precios válidos para el arma.");
+                 return;
+            }
         } else {
-             // Price can be 0, so check specifically for NaN if parsing failed for non-zero values.
             if (isNaN(price)) { 
                 alert("Por favor, introduce un precio base válido.");
                 return;
             }
         }
-
 
         if (!name || !category ) {
             alert("Completa Nombre y Categoría.");
@@ -346,7 +351,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
     function renderProducts() {
         if (!productListContainer || !CATEGORIES_CONFIG[activeCategory]) return;
         productListContainer.innerHTML = '';
@@ -403,7 +407,6 @@ document.addEventListener('DOMContentLoaded', () => {
             priceInfoHTML = `<p>Precio: <strong>${formatPrice(price)}</strong></p>`;
             stockValue = currentStock * price;
         }
-
 
         card.innerHTML = `
             <img src="${imageUrl}" alt="${product.name}" onerror="this.onerror=null; this.src='${DEFAULT_IMAGE_URL}';">
@@ -462,6 +465,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }).then(transactionResult => {
             if (transactionResult.committed) {
                 const updatedStock = transactionResult.snapshot.val();
+                // productsData might not be updated yet by the 'on value' listener for this specific change
+                // So, it's better to re-fetch or use the local product data if it's consistent
+                // For simplicity, we'll assume productsData[productId] is sufficiently up-to-date
+                // or the main 'on value' listener will refresh it soon enough.
+                // For immediate accuracy of stock value, calculate based on transaction.
                 const product = productsData[productId];
                 if (product) {
                     let itemPrice = 0;
@@ -477,11 +485,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         stockValueElement.textContent = formatPrice(newStockValue);
                     }
                 }
+                // Recalculate overall total, as it might be affected
+                // This will be more accurate if productsData is already reflecting the stock change
                 calculateTotalInventoryValue(); 
             }
         }).catch(error => console.error("Error actualizando stock:", error));
     }
-
 
     function deleteProduct(productId) {
         db.ref(`products/${productId}`).remove()
