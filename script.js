@@ -51,8 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const productInitialStockInput = document.getElementById('product-initial-stock');
     const productInitialStockGroup = document.getElementById('product-initial-stock-group');
     const productImageNameInput = document.getElementById('product-image-name');
+    const productPriceInput = document.getElementById('product-price');
+    const armaPricesGroup = document.getElementById('arma-prices-group');
+    const productPriceLoadedInput = document.getElementById('product-price-loaded');
+    const productPriceUnloadedInput = document.getElementById('product-price-unloaded');
+    const totalInventoryValueDisplay = document.getElementById('total-inventory-value');
 
-    const DEFAULT_IMAGE_URL = 'default-product.png';
+
+    const DEFAULT_IMAGE_URL = 'default-product.png'; // Make sure this image exists or provide a valid URL
     const PRODUCT_IMAGE_FOLDER = 'productos/';
     const CATEGORIES_CONFIG = {
         "ARMAS": { name: "Armas", subcategories: ["PISTOLAS", "SUBFUSILES", "FUSILES", "ESCOPETAS"] },
@@ -132,6 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (userEmailDisplay) userEmailDisplay.textContent = '';
             if (productListContainer) productListContainer.innerHTML = '';
             if (categoryTabsContainer) categoryTabsContainer.innerHTML = '';
+            if (totalInventoryValueDisplay) totalInventoryValueDisplay.textContent = '$0.00';
         }
     }
 
@@ -173,12 +180,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function openModal(mode = 'add', productData = null) {
-        if (!productForm || !productIdInput || !modalTitle || !productModalContent || !productModal) return;
+        if (!productForm || !productIdInput || !modalTitle || !productModalContent || !productModal || !productPriceInput || !productPriceLoadedInput || !productPriceUnloadedInput) return;
         
         productForm.reset();
         productIdInput.value = '';
-        if (subcategoryGroup) subcategoryGroup.style.display = 'none';
-        if (productSubcategorySelect) productSubcategorySelect.required = false;
+        productPriceInput.value = '0';
+        productPriceLoadedInput.value = '0';
+        productPriceUnloadedInput.value = '0';
+
+        handleCategoryChangeForModal(); // Initial setup for price fields visibility
 
         if (mode === 'edit' && productData) {
             modalTitle.textContent = 'Editar Producto';
@@ -188,12 +198,17 @@ document.addEventListener('DOMContentLoaded', () => {
             productIdInput.value = productData.id;
             if (productNameInput) productNameInput.value = productData.name;
             if (productCategorySelect) productCategorySelect.value = productData.category;
+            
+            handleCategoryChangeForModal(); // Update visibility based on loaded category
+
             if (productData.category === 'ARMAS' && subcategoryGroup && productSubcategorySelect) {
-                subcategoryGroup.style.display = 'block';
-                productSubcategorySelect.required = true;
                 productSubcategorySelect.value = productData.subcategory || '';
             }
             if (productImageNameInput) productImageNameInput.value = productData.imageName || '';
+            productPriceInput.value = productData.price || '0';
+            productPriceLoadedInput.value = productData.priceLoaded || '0';
+            productPriceUnloadedInput.value = productData.priceUnloaded || '0';
+
         } else {
             modalTitle.textContent = 'Añadir Nuevo Producto';
             productModalContent.classList.remove('editing-mode');
@@ -204,45 +219,78 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleCategoryChangeForModal() {
-        if (!productCategorySelect || !subcategoryGroup || !productSubcategorySelect) return;
-        if (productCategorySelect.value === 'ARMAS') {
+        if (!productCategorySelect || !subcategoryGroup || !productSubcategorySelect || !armaPricesGroup || !productPriceInput) return;
+        const isArmas = productCategorySelect.value === 'ARMAS';
+
+        if (isArmas) {
             subcategoryGroup.style.display = 'block';
             productSubcategorySelect.required = true;
+            armaPricesGroup.style.display = 'block';
+            productPriceInput.parentElement.style.display = 'none'; // Hide base price
+            if (productPriceLoadedInput) productPriceLoadedInput.required = true;
+            if (productPriceUnloadedInput) productPriceUnloadedInput.required = true;
         } else {
             subcategoryGroup.style.display = 'none';
             productSubcategorySelect.required = false;
             productSubcategorySelect.value = '';
+            armaPricesGroup.style.display = 'none';
+            productPriceInput.parentElement.style.display = 'block'; // Show base price
+            if (productPriceLoadedInput) productPriceLoadedInput.required = false;
+            if (productPriceUnloadedInput) productPriceUnloadedInput.required = false;
         }
     }
 
     function handleProductFormSubmit(e) {
         e.preventDefault();
-        if (!productIdInput || !productNameInput || !productCategorySelect || !productImageNameInput || !productModal) return;
+        if (!productIdInput || !productNameInput || !productCategorySelect || !productImageNameInput || !productModal || !productPriceInput || !productPriceLoadedInput || !productPriceUnloadedInput) return;
 
         const id = productIdInput.value;
         const name = productNameInput.value.trim();
         const category = productCategorySelect.value;
         const subcategory = (category === 'ARMAS' && productSubcategorySelect) ? productSubcategorySelect.value : '';
         const imageName = productImageNameInput.value.trim();
+        
+        let price = parseFloat(productPriceInput.value) || 0;
+        let priceLoaded = 0;
+        let priceUnloaded = 0;
 
-        if (!name || !category || (category === 'ARMAS' && !subcategory)) {
-            alert("Completa Nombre, Categoría (y Subcategoría para Armas).");
+        if (category === 'ARMAS') {
+            priceLoaded = parseFloat(productPriceLoadedInput.value) || 0;
+            priceUnloaded = parseFloat(productPriceUnloadedInput.value) || 0;
+            price = 0; // Base price not used for ARMAS
+             if (!subcategory) {
+                alert("Para Armas, la subcategoría es obligatoria.");
+                return;
+            }
+        } else {
+            if (!price && price !==0) { // Allow 0 price
+                alert("Por favor, introduce un precio base válido.");
+                return;
+            }
+        }
+
+
+        if (!name || !category ) {
+            alert("Completa Nombre y Categoría.");
             return;
         }
 
-        const productPayload = { name, category, subcategory, imageName };
+        const productPayload = { name, category, subcategory, imageName, price, priceLoaded, priceUnloaded };
 
-        if (id) {
+        if (id) { // Editing existing product
             const updates = {};
             updates[`/products/${id}/name`] = name;
             updates[`/products/${id}/category`] = category;
             updates[`/products/${id}/subcategory`] = subcategory;
             updates[`/products/${id}/imageName`] = imageName;
+            updates[`/products/${id}/price`] = price;
+            updates[`/products/${id}/priceLoaded`] = priceLoaded;
+            updates[`/products/${id}/priceUnloaded`] = priceUnloaded;
             
             db.ref().update(updates)
                 .then(() => productModal.classList.remove('active'))
                 .catch(error => console.error("Error actualizando: ", error));
-        } else { 
+        } else { // Adding new product
             if (productInitialStockInput) {
                 productPayload.stock = parseInt(productInitialStockInput.value) || 0;
             } else {
@@ -262,11 +310,32 @@ document.addEventListener('DOMContentLoaded', () => {
         productsRef.on('value', (snapshot) => {
             productsData = snapshot.val() || {};
             renderProducts();
+            calculateTotalInventoryValue();
         }, (error) => {
             console.error("Error al cargar productos:", error);
             if (productListContainer) productListContainer.innerHTML = "<p class='error-message'>Error al cargar productos.</p>";
         });
     }
+    
+    function calculateTotalInventoryValue() {
+        let totalValue = 0;
+        for (const id in productsData) {
+            const product = productsData[id];
+            const stock = product.stock || 0;
+            let itemPrice = 0;
+
+            if (product.category === 'ARMAS') {
+                itemPrice = parseFloat(product.priceUnloaded) || 0;
+            } else {
+                itemPrice = parseFloat(product.price) || 0;
+            }
+            totalValue += stock * itemPrice;
+        }
+        if (totalInventoryValueDisplay) {
+            totalInventoryValueDisplay.textContent = `$${totalValue.toFixed(2)}`;
+        }
+    }
+
 
     function renderProducts() {
         if (!productListContainer || !CATEGORIES_CONFIG[activeCategory]) return;
@@ -300,15 +369,42 @@ document.addEventListener('DOMContentLoaded', () => {
             : `${slugify(product.name)}.png`;
         const imageUrl = `${PRODUCT_IMAGE_FOLDER}${imageName}`;
         
-        const categoryDisplayName = CATEGORIES_CONFIG[product.category]?.name || product.category;
-        const subCategoryDisplayName = product.subcategory ? ` / ${product.subcategory.toUpperCase()}` : '';
+        let displayCategoryText = '';
+        if (product.category === 'ARMAS' && product.subcategory) {
+            displayCategoryText = product.subcategory.toUpperCase();
+        } else {
+            displayCategoryText = CATEGORIES_CONFIG[product.category]?.name || product.category;
+        }
+
+        let priceInfoHTML = '';
+        let stockValue = 0;
+        const currentStock = product.stock || 0;
+
+        if (product.category === 'ARMAS') {
+            const priceUnloaded = parseFloat(product.priceUnloaded) || 0;
+            const priceLoaded = parseFloat(product.priceLoaded) || 0;
+            priceInfoHTML = `
+                <p>Descargada: <strong>$${priceUnloaded.toFixed(2)}</strong></p>
+                <p>Cargada: <strong>$${priceLoaded.toFixed(2)}</strong></p>
+            `;
+            stockValue = currentStock * priceUnloaded; // Using unloaded price for stock value of armas
+        } else {
+            const price = parseFloat(product.price) || 0;
+            priceInfoHTML = `<p>Precio: <strong>$${price.toFixed(2)}</strong></p>`;
+            stockValue = currentStock * price;
+        }
+
 
         card.innerHTML = `
             <img src="${imageUrl}" alt="${product.name}" onerror="this.onerror=null; this.src='${DEFAULT_IMAGE_URL}';">
             <div class="product-info">
                 <h4>${product.name}</h4>
-                <span class="product-category-display">${categoryDisplayName}${subCategoryDisplayName}</span>
-                <p class="stock-display">Stock: <strong id="stock-${product.id}">${product.stock || 0}</strong></p>
+                <span class="product-category-display">${displayCategoryText}</span>
+                <div class="product-price-info">
+                    ${priceInfoHTML}
+                </div>
+                <p class="product-stock-value">Valor Stock: <strong id="stock-value-${product.id}">$${stockValue.toFixed(2)}</strong></p>
+                <p class="stock-display">Stock: <strong id="stock-${product.id}">${currentStock}</strong></p>
                 <div class="stock-controls">
                     <button class="btn-icon-small stock-adjust" data-action="remove" title="Restar cantidad"><i class="fas fa-minus"></i></button>
                     <input type="number" class="bulk-stock-amount" value="1" min="1" aria-label="Cantidad a modificar">
@@ -352,9 +448,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const productRef = db.ref(`products/${productId}/stock`);
         productRef.transaction(currentStock => {
             const newStock = (currentStock || 0) + change;
-            return Math.max(0, newStock);
+            return Math.max(0, newStock); // Ensure stock doesn't go below 0
+        }).then(transactionResult => {
+            if (transactionResult.committed) {
+                const updatedStock = transactionResult.snapshot.val();
+                const product = productsData[productId];
+                if (product) {
+                    let itemPrice = 0;
+                    if (product.category === 'ARMAS') {
+                        itemPrice = parseFloat(product.priceUnloaded) || 0;
+                    } else {
+                        itemPrice = parseFloat(product.price) || 0;
+                    }
+                    const newStockValue = updatedStock * itemPrice;
+                    
+                    const stockValueElement = document.getElementById(`stock-value-${productId}`);
+                    if (stockValueElement) {
+                        stockValueElement.textContent = `$${newStockValue.toFixed(2)}`;
+                    }
+                }
+                calculateTotalInventoryValue(); // Recalculate overall total
+            }
         }).catch(error => console.error("Error actualizando stock:", error));
     }
+
 
     function deleteProduct(productId) {
         db.ref(`products/${productId}`).remove()
