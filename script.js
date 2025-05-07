@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Firebase Config --- (Sin cambios)
     const firebaseConfig = {
       apiKey: "AIzaSyAGLOrAVlbGHxxA2CWJsMOVyxPPsICQBVA", // TU API KEY
       authDomain: "lamesashopweb.firebaseapp.com",
@@ -11,20 +10,20 @@ document.addEventListener('DOMContentLoaded', () => {
       measurementId: "G-KM4WBQPN0X"
     };
 
-    // --- Initialize Firebase ---
     try {
         firebase.initializeApp(firebaseConfig);
     } catch (e) {
         console.error("Error inicializando Firebase:", e);
-        // Podrías mostrar un mensaje de error más amigable al usuario aquí
-        document.getElementById('app-loader').innerHTML = '<p style="color:red;">Error al conectar con el servidor. Por favor, recarga la página.</p>';
-        return; // Detener la ejecución si Firebase no se inicializa
+        const loader = document.getElementById('app-loader');
+        if (loader) {
+            loader.innerHTML = '<p style="color:red; text-align:center; padding:20px;">Error al conectar con el servidor.<br>Por favor, recarga la página.</p>';
+        }
+        return; 
     }
     
     const auth = firebase.auth();
     const db = firebase.database();
 
-    // --- DOM Elements --- (Sin cambios en las declaraciones)
     const body = document.body;
     const appLoader = document.getElementById('app-loader');
     const appContainer = document.getElementById('app-container');
@@ -53,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const productInitialStockGroup = document.getElementById('product-initial-stock-group');
     const productImageNameInput = document.getElementById('product-image-name');
 
-    // --- Constants --- (Sin cambios)
     const DEFAULT_IMAGE_URL = 'default-product.png';
     const PRODUCT_IMAGE_FOLDER = 'productos/';
     const CATEGORIES_CONFIG = {
@@ -65,11 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const CATEGORY_ORDER = Object.keys(CATEGORIES_CONFIG);
 
-    // --- App State --- (Sin cambios)
     let productsData = {};
     let activeCategory = CATEGORY_ORDER[0];
 
-    // --- SLUGIFY --- (Sin cambios)
     function slugify(text) {
         if (!text) return '';
         return text.toString().toLowerCase()
@@ -78,59 +74,49 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/--+/g, '_').replace(/^-+/, '').replace(/-+$/, '');
     }
 
-    // --- INITIAL APP SETUP ---
     function initializeAppUI() {
-        console.log("initializeAppUI called");
-        // Set copyright year
         if (copyrightYearSpan) {
             copyrightYearSpan.textContent = new Date().getFullYear();
         }
 
-        // Apply saved theme or default to dark
         const savedTheme = localStorage.getItem('theme') || 'dark'; 
         applyTheme(savedTheme);
 
-        // Theme toggle listener
-        themeToggleButton.addEventListener('click', () => {
-            const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
-            localStorage.setItem('theme', newTheme);
-            applyTheme(newTheme);
-        });
-
-        // Modal listeners (solo si los elementos existen para evitar errores si no hay user)
+        if (themeToggleButton) {
+            themeToggleButton.addEventListener('click', () => {
+                const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
+                localStorage.setItem('theme', newTheme);
+                applyTheme(newTheme);
+            });
+        }
+        
         if (showAddProductModalButton) showAddProductModalButton.addEventListener('click', () => openModal('add'));
         if (closeProductModalButton) closeProductModalButton.addEventListener('click', () => productModal.classList.remove('active'));
         
-        window.addEventListener('click', (event) => { // Este es seguro
+        window.addEventListener('click', (event) => {
             if (event.target === productModal) productModal.classList.remove('active');
         });
 
         if (productCategorySelect) productCategorySelect.addEventListener('change', handleCategoryChangeForModal);
         if (productForm) productForm.addEventListener('submit', handleProductFormSubmit);
         
-        // Login form listener (seguro)
         if (loginForm) loginForm.addEventListener('submit', handleLogin);
         if (logoutButton) logoutButton.addEventListener('click', () => {
             auth.signOut().catch(error => console.error("Error al cerrar sesión:", error));
         });
     }
     
-    // --- THEME --- (Sin cambios)
     function applyTheme(theme) {
         if (theme === 'dark') {
             body.classList.add('dark-mode');
-            themeToggleButton.innerHTML = '<i class="fas fa-moon"></i>';
+            if (themeToggleButton) themeToggleButton.innerHTML = '<i class="fas fa-moon"></i>';
         } else {
             body.classList.remove('dark-mode');
-            themeToggleButton.innerHTML = '<i class="fas fa-sun"></i>';
+            if (themeToggleButton) themeToggleButton.innerHTML = '<i class="fas fa-sun"></i>';
         }
     }
 
-    // --- AUTHENTICATION ---
     function handleAuthStateChange(user) {
-        console.log("Auth state changed. User:", user ? user.email : "null");
-        
-        // Hide loader and show app container AFTER auth state is known
         if (appLoader) appLoader.classList.add('hidden');
         if (appContainer) appContainer.style.display = 'block';
 
@@ -166,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
-    // --- CATEGORY TABS --- (Sin cambios)
     function setupCategoryTabs() {
         if (!categoryTabsContainer) return;
         categoryTabsContainer.innerHTML = '';
@@ -187,9 +172,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- MODAL HANDLING (ADD/EDIT) --- (Sin cambios en la lógica interna, pero wrappers si los elementos no existen)
     function openModal(mode = 'add', productData = null) {
-        if (!productForm || !productIdInput || !modalTitle || !productModalContent || !productInitialStockGroup || !productModal) return;
+        if (!productForm || !productIdInput || !modalTitle || !productModalContent || !productModal) return;
         
         productForm.reset();
         productIdInput.value = '';
@@ -248,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const productPayload = { name, category, subcategory, imageName };
 
-        if (id) { // Edit
+        if (id) {
             const updates = {};
             updates[`/products/${id}/name`] = name;
             updates[`/products/${id}/category`] = category;
@@ -258,11 +242,11 @@ document.addEventListener('DOMContentLoaded', () => {
             db.ref().update(updates)
                 .then(() => productModal.classList.remove('active'))
                 .catch(error => console.error("Error actualizando: ", error));
-        } else { // Add
+        } else { 
             if (productInitialStockInput) {
                 productPayload.stock = parseInt(productInitialStockInput.value) || 0;
             } else {
-                productPayload.stock = 0; // Default si el input no existe por alguna razón
+                productPayload.stock = 0;
             }
             const newProductRef = db.ref('products').push();
             productPayload.id = newProductRef.key;
@@ -273,7 +257,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // --- PRODUCT LOGIC --- (renderProducts, createProductCard, updateStock, deleteProduct sin cambios mayores, solo verificar que los contenedores existan antes de manipularlos)
     function loadProducts() {
         const productsRef = db.ref('products');
         productsRef.on('value', (snapshot) => {
@@ -318,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const imageUrl = `${PRODUCT_IMAGE_FOLDER}${imageName}`;
         
         const categoryDisplayName = CATEGORIES_CONFIG[product.category]?.name || product.category;
-        const subCategoryDisplayName = product.subcategory ? ` / ${product.subcategory}` : '';
+        const subCategoryDisplayName = product.subcategory ? ` / ${product.subcategory.toUpperCase()}` : '';
 
         card.innerHTML = `
             <img src="${imageUrl}" alt="${product.name}" onerror="this.onerror=null; this.src='${DEFAULT_IMAGE_URL}';">
@@ -377,10 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
         db.ref(`products/${productId}`).remove()
             .catch(error => console.error("Error eliminando producto:", error));
     }
-
-    // --- Start the app logic ---
-    // 1. Initialize UI elements (theme, copyright) that don't depend on auth.
+    
     initializeAppUI();
-    // 2. Firebase auth will then trigger handleAuthStateChange.
-    //    No need to call it explicitly here, `onAuthStateChanged` handles the initial check.
+    auth.onAuthStateChanged(handleAuthStateChange);
 });
