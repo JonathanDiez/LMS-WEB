@@ -1,5 +1,5 @@
 :root {
-    --primary-color: #007bff; 
+    --primary-color: #007bff;
     --secondary-color: #6c757d;
     --success-color: #28a745;
     --danger-color: #dc3545;
@@ -25,11 +25,11 @@
     --secondary-color: #adb5bd;
     --success-color: #198754;
     --info-color: #0dcaf0;
-    --bg-color: #121212; 
-    --surface-color: #1e1e1e; 
+    --bg-color: #121212;
+    --surface-color: #1e1e1e;
     --text-color: #e0e0e0;
     --text-muted-color: #a0a0a0;
-    --border-color: #3a3a3a; 
+    --border-color: #3a3a3a;
     --input-bg: #2c2c2c;
     --input-border: #4a4a4a;
     --shadow-sm: 0 .125rem .25rem rgba(255,255,255,.03);
@@ -46,19 +46,11 @@ body {
     line-height: 1.6;
     display: flex;
     justify-content: center;
-    align-items: flex-start; 
+    align-items: flex-start;
     min-height: 100vh;
-    padding-top: 0; 
+    padding-top: 0;
     transition: background-color 0.3s ease, color 0.3s ease;
-    overflow-x: hidden; 
-}
-
-#app-container {
-    width: 100%;
-    max-width: 1200px;
-    padding: 20px 0 0 0;
-    margin: 0 auto;
-    display: none;
+    overflow-x: hidden;
 }
 
 #app-loader {
@@ -79,7 +71,7 @@ body {
 }
 
 .spinner {
-    border: 4px solid rgba(var(--text-color-rgb), 0.1); 
+    border: 4px solid rgba(var(--text-color-rgb), 0.1);
     border-left-color: var(--primary-color);
     border-radius: 50%;
     width: 40px;
@@ -99,24 +91,25 @@ body {
 #app-container {
     width: 100%;
     max-width: 1200px;
-    padding: 20px 15px 0 15px;
+    padding: 20px 0 0 0;
+    margin: 0 auto;
     display: none;
 }
 
 .screen { display: none; }
 .screen.active { display: block; }
 
-#login-screen.active { 
-    display: flex; 
+#login-screen.active {
+    display: flex;
     align-items: center;
     justify-content: center;
-    position: fixed; 
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    padding: 0; 
-    z-index: 1000; 
+    padding: 0;
+    z-index: 1000;
 }
 
 .login-wallpaper {
@@ -128,7 +121,7 @@ body {
     background-image: url('https://i.imgur.com/2nW8rVX.jpeg');
     background-size: cover;
     background-position: center;
-    filter: brightness(0.5); 
+    filter: brightness(0.5);
     z-index: 1;
 }
 
@@ -138,14 +131,14 @@ body {
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
     max-width: 400px;
-    width: calc(100% - 40px); 
+    width: calc(100% - 40px);
     text-align: center;
     z-index: 2;
     position: relative;
     border: 1px solid var(--border-color);
 }
 .dark-mode .login-container {
-    background-color: rgba(30, 30, 30, 0.9); 
+    background-color: rgba(30, 30, 30, 0.9);
 }
 
 .login-container h2 {
@@ -182,7 +175,7 @@ body {
 .input-group input,
 .input-group select {
     width: 100%;
-    padding: 12px 15px 12px 40px; 
+    padding: 12px 15px 12px 40px;
     border: 1px solid var(--input-border);
     border-radius: var(--border-radius);
     box-sizing: border-box;
@@ -250,7 +243,6 @@ header {
     border-bottom: 1px solid var(--border-color);
     box-shadow: var(--shadow-sm);
 }
-
 .header-content {
     display: flex;
     justify-content: space-between;
@@ -259,7 +251,6 @@ header {
     margin: 0 auto;
     padding: 0 15px;
 }
-
 header h1 { margin: 0; font-size: 1.8rem; font-weight: 600; color: var(--primary-color); }
 .header-controls { display: flex; align-items: center; gap: 15px; }
 .user-info { display: flex; align-items: center; gap: 10px; }
@@ -277,8 +268,8 @@ main {
     gap: 5px;
     margin-bottom: 25px;
     border-bottom: 2px solid var(--border-color);
-    padding-bottom: 0; 
-    overflow-x: auto; 
+    padding-bottom: 0;
+    overflow-x: auto;
 }
 .tab-button {
     padding: 10px 18px;
@@ -289,7 +280,7 @@ main {
     background-color: transparent;
     color: var(--text-muted-color);
     border-bottom: 3px solid transparent;
-    margin-bottom: -2px; 
+    margin-bottom: -2px;
     transition: color 0.2s ease, border-bottom-color 0.2s ease;
     white-space: nowrap;
 }
@@ -328,7 +319,7 @@ main {
     height: 180px;
     object-fit: cover;
     border-bottom: 1px solid var(--border-color);
-    background-color: #e9ecef; 
+    background-color: #e9ecef;
 }
 .dark-mode .product-card img {
     background-color: #3a3a3a;
@@ -357,7 +348,7 @@ main {
     margin-bottom: 15px;
 }
 .stock-controls .btn-icon-small {
-    padding: 8px 10px; 
+    padding: 8px 10px;
     font-size: 1rem;
     background-color: var(--input-bg);
     color: var(--text-color);
@@ -366,19 +357,19 @@ main {
 .stock-controls .btn-icon-small:hover { background-color: var(--border-color); }
 .dark-mode .stock-controls .btn-icon-small:hover { background-color: #4a4a4a; }
 
-.stock-controls input[type="number"].bulk-stock-amount { 
-    width: 70px; 
+.stock-controls input[type="number"].bulk-stock-amount {
+    width: 70px;
     padding: 8px;
     text-align: center;
     border: 1px solid var(--input-border);
     border-radius: var(--border-radius);
     background-color: var(--input-bg);
     color: var(--text-color);
-    -moz-appearance: textfield; 
+    -moz-appearance: textfield;
 }
 .stock-controls input[type="number"].bulk-stock-amount::-webkit-outer-spin-button,
 .stock-controls input[type="number"].bulk-stock-amount::-webkit-inner-spin-button {
-    -webkit-appearance: none; 
+    -webkit-appearance: none;
     margin: 0;
 }
 
@@ -400,7 +391,7 @@ main {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.7); 
+    background-color: rgba(0, 0, 0, 0.7);
     align-items: center;
     justify-content: center;
     padding: 20px;
@@ -434,7 +425,7 @@ main {
 }
 .close-button:hover, .close-button:focus { color: var(--danger-color); }
 .modal-content h2 { margin-top: 0; color: var(--primary-color); margin-bottom: 25px; font-weight: 600; }
-.modal-content.editing-mode #product-initial-stock-group { 
+.modal-content.editing-mode #product-initial-stock-group {
     display: none;
 }
 
@@ -452,21 +443,21 @@ footer {
     .header-controls { width: 100%; justify-content: space-between; }
     .user-info { justify-content: flex-end; }
     .product-grid { grid-template-columns: 1fr; }
-    .login-container { margin: 0 20px; } 
+    .login-container { margin: 0 20px; }
     .main-controls { text-align: center; }
-    .category-tabs { padding-left: 0; padding-right: 0; } 
+    .category-tabs { padding-left: 0; padding-right: 0; }
 }
 @media (max-width: 480px) {
     .login-container h2 { font-size: 1.5rem; }
-    .stock-controls { 
-        flex-wrap: nowrap; 
+    .stock-controls {
+        flex-wrap: nowrap;
         justify-content: space-between;
     }
     .stock-controls input[type="number"].bulk-stock-amount {
-        width: 50px; 
+        width: 50px;
     }
     .stock-controls .btn-icon-small {
-        padding: 8px; 
+        padding: 8px;
         font-size: 0.9rem;
     }
     .product-actions { flex-direction: column; }
